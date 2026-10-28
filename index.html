@@ -20,7 +20,6 @@
   }
   h1 { font-size: 1.6rem; font-weight: 500; margin: 0; padding: 0 16px; }
   #count { font-size: 3.5rem; font-weight: bold; margin: 0; }
-  #timer { font-size: 1rem; color: #8b95a3; margin-top: 24px; }
   #error { font-size: .85rem; color: #e5776b; min-height: 1.2em; max-width: 90vw; }
 </style>
 </head>
@@ -28,18 +27,14 @@
   <h1>fisheSB's Jungle Wood Collection</h1>
   <p id="count">...</p>
   <div id="error"></div>
-  <div id="timer">Updating in ...</div>
 
 <script>
-  const REFRESH_SECONDS = 60;
   const countEl = document.getElementById("count");
-  const timerEl = document.getElementById("timer");
   const errorEl = document.getElementById("error");
-  let secondsLeft = REFRESH_SECONDS;
 
   async function update() {
     try {
-      const res = await fetch("/api/count");
+      const res = await fetch("/api/count?t=" + Date.now(), { cache: "no-store" });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       errorEl.textContent = "";
@@ -49,18 +44,8 @@
     }
   }
 
-  function tick() {
-    secondsLeft--;
-    if (secondsLeft <= 0) {
-      secondsLeft = REFRESH_SECONDS;
-      update();
-    }
-    timerEl.textContent = "Updating in " + secondsLeft + "s";
-  }
-
   update();
-  timerEl.textContent = "Updating in " + secondsLeft + "s";
-  setInterval(tick, 1000);
+  setInterval(update, 15000);
 </script>
 </body>
 </html>
