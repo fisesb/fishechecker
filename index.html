@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fisheSB's Jungle Wood Collection</title>
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: #14181f;
+    color: #e8ecf1;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    text-align: center;
+  }
+  h1 { font-size: 1.6rem; font-weight: 500; margin: 0; padding: 0 16px; }
+  #count { font-size: 3.5rem; font-weight: bold; margin: 0; }
+  #timer { font-size: 1rem; color: #8b95a3; margin-top: 24px; }
+  #error { font-size: .85rem; color: #e5776b; min-height: 1.2em; max-width: 90vw; }
+</style>
+</head>
+<body>
+  <h1>fisheSB's Jungle Wood Collection</h1>
+  <p id="count">...</p>
+  <div id="error"></div>
+  <div id="timer">Updating in ...</div>
+
+<script>
+  const REFRESH_SECONDS = 60;
+  const countEl = document.getElementById("count");
+  const timerEl = document.getElementById("timer");
+  const errorEl = document.getElementById("error");
+  let secondsLeft = REFRESH_SECONDS;
+
+  async function update() {
+    try {
+      const res = await fetch("/api/count");
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      errorEl.textContent = "";
+      countEl.textContent = data.count.toLocaleString();
+    } catch (err) {
+      errorEl.textContent = err.message;
+    }
+  }
+
+  function tick() {
+    secondsLeft--;
+    if (secondsLeft <= 0) {
+      secondsLeft = REFRESH_SECONDS;
+      update();
+    }
+    timerEl.textContent = "Updating in " + secondsLeft + "s";
+  }
+
+  update();
+  timerEl.textContent = "Updating in " + secondsLeft + "s";
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>
